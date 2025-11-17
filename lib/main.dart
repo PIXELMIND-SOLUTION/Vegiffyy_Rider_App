@@ -55,11 +55,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:veggify_delivery_app/global/toast.dart';
+import 'package:veggify_delivery_app/provider/AcceptedOrder/accepted_order_provider.dart';
 import 'package:veggify_delivery_app/provider/Auth/login_provider.dart';
 import 'package:veggify_delivery_app/provider/Auth/signup_provider.dart';
 import 'package:veggify_delivery_app/provider/Dashboard/dashboard_provider.dart';
 import 'package:veggify_delivery_app/provider/LocationProvider/location_provider.dart';
 import 'package:veggify_delivery_app/provider/PendingOrder/new_order_provider.dart';
+import 'package:veggify_delivery_app/provider/PickedOrder/picked_order_provider.dart';
 import 'package:veggify_delivery_app/provider/Profile/profile_provider.dart';
 import 'package:veggify_delivery_app/provider/RiderStatus/delivery_status_provider.dart';
 import 'package:veggify_delivery_app/provider/Wallet/wallet_provider.dart';
@@ -89,6 +91,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => DeliveryStatusProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => NewOrderProvider()),
+        ChangeNotifierProvider(create: (_) => AcceptedOrderProvider()),
+        ChangeNotifierProvider(create: (_) => PickedOrderProvider()),
       ],
       child: const MyApp(),
     ),

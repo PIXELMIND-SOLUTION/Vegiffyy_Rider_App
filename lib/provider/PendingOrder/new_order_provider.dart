@@ -24,6 +24,8 @@ class NewOrderService {
   /// accept order
   static Future<Map<String, dynamic>> acceptOrder(String orderId, String deliveryBoyId) async {
     final url = Uri.parse('$baseUrl/api/accept-order/$orderId/$deliveryBoyId');
+        print("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss$url");
+
     final resp = await http.put(url, headers: {'Content-Type': 'application/json'},body: jsonEncode({'orderStatus': 'Rider Accepted'}),);
     print("kggggggggggggdddddddddddddddddddddddddddddddd${resp.body}");
     if (resp.statusCode < 200 || resp.statusCode >= 300) {

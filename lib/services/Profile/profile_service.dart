@@ -7,7 +7,7 @@ import 'package:veggify_delivery_app/constants/api_constant.dart';
 class ProfileService {
   static const _profilePath = '/api/delivery-boy/myprofile';
   static const _updateImagePath = '/api/delivery-boy/updateProfileImage';
-  static const _updateProfilePath = '/api/updateprofile'; // new
+  static const _updateProfilePath = '/api/delivery-boy/updateprofile'; // new
 
   /// GET profile by id
   static Future<Map<String, dynamic>> getProfile(String id, {String? authToken}) async {
@@ -50,16 +50,13 @@ class ProfileService {
   static Future<Map<String, dynamic>> updateProfile({
     required String deliveryBoyId,
     required Map<String, dynamic> body,
-    String? authToken,
   }) async {
     final uri = Uri.parse('${ApiConstant.baseUrl}$_updateProfilePath/$deliveryBoyId');
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-    if (authToken != null) headers['Authorization'] = 'Bearer $authToken';
+    print("Responase body printing: $uri");
+    print("Responase body printing: $body");
 
-    final resp = await http.put(uri, headers: headers, body: json.encode(body));
+    final resp = await http.put(uri, body: body);
+    print("Responase body printing: ${resp.body}");
     if (resp.statusCode >= 200 && resp.statusCode < 300) {
       return json.decode(resp.body) as Map<String, dynamic>;
     } else {

@@ -96,10 +96,11 @@ class ProfileProvider extends ChangeNotifier {
         if (email != null) 'email': email,
       };
 
+      print("oooooooooooooooooooooooo$body");
+
       final json = await ProfileService.updateProfile(
         deliveryBoyId: id,
         body: body,
-        authToken: await SessionManager.getAuthToken(),
       );
 
       // If response includes updated `data`, refresh local profile

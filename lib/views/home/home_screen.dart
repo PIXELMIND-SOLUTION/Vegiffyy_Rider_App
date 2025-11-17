@@ -2254,8 +2254,10 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:veggify_delivery_app/provider/Dashboard/dashboard_provider.dart';
 import 'package:veggify_delivery_app/provider/PendingOrder/new_order_provider.dart';
+import 'package:veggify_delivery_app/provider/Profile/profile_provider.dart';
 import 'package:veggify_delivery_app/provider/RiderStatus/delivery_status_provider.dart';
 import 'package:veggify_delivery_app/services/PendingOrder/pending_order_service.dart';
+import 'package:veggify_delivery_app/views/orderdelivered/order_delivered_screen.dart';
 import 'package:veggify_delivery_app/views/orderpickup/order_pickup_screen.dart';
 import 'package:veggify_delivery_app/widgets/online_offline_button.dart';
 import 'package:veggify_delivery_app/widgets/switch_widget.dart';
@@ -2346,11 +2348,42 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // Removed popup; navigation goes directly to OrderPickupScreen
-  void _onAcceptOrderTap() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => OrderPickupScreen()),
+  _onAcceptOrderTap(String? currentOrderStatus) {
+    final status = (currentOrderStatus ?? '').trim();
+    print(
+      "kgdjksafjsfsjhfjdsfhlsdfhslfhjlfhdsfhsdfflkjflfhj$currentOrderStatus",
     );
+    if (status == 'Rider Accepted') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const OrderPickupScreen()),
+      );
+      return;
+    }
+
+    if (status == 'Picked') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const OrderDeliveredScreen()),
+      );
+      return;
+    }
+
+    // For "Pending", empty, null or any other status -> show toast
+    try {
+      // use your existing GlobalToast if available
+      GlobalToast.showInfo('No Orders Found');
+    } catch (_) {
+      // fallback to ScaffoldMessenger if GlobalToast isn't in scope
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No Orders Found'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
   }
 
   String _getDisplayAddress(String address) {
@@ -2498,32 +2531,29 @@ class _HomeScreenState extends State<HomeScreen>
                   // Header: avatar + location + actions
                   Row(
                     children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 2,
+                      Consumer<ProfileProvider>(
+                         builder: (context, provider, _) {
+                                    final profile = provider.profile!;
+
+                        return Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              width: 2,
+                            ),
                           ),
+                          child:                        CircleAvatar(
+                          radius: 55,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: profile.profileImage != null
+                              ? NetworkImage(profile.profileImage!)
+                              : const AssetImage('assets/home.png') as ImageProvider,
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/home.png',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey.shade200,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.grey.shade400,
-                                  size: 30,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                        );
+                         }
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -2534,33 +2564,33 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(width: 8),
                       OnlineOfflineButton(),
                       const SizedBox(width: 12),
-                      Stack(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.notifications_outlined,
-                              size: 24,
-                            ),
-                          ),
-                          Positioned(
-                            right: 8,
-                            top: 8,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Stack(
+                      //   children: [
+                      //     Container(
+                      //       padding: const EdgeInsets.all(8),
+                      //       decoration: BoxDecoration(
+                      //         color: Colors.grey.shade100,
+                      //         shape: BoxShape.circle,
+                      //       ),
+                      //       child: const Icon(
+                      //         Icons.notifications_outlined,
+                      //         size: 24,
+                      //       ),
+                      //     ),
+                      //     Positioned(
+                      //       right: 8,
+                      //       top: 8,
+                      //       child: Container(
+                      //         width: 8,
+                      //         height: 8,
+                      //         decoration: const BoxDecoration(
+                      //           color: Colors.red,
+                      //           shape: BoxShape.circle,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
 
@@ -2730,61 +2760,81 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildUpdateOrderCard() {
-    return GestureDetector(
-      onTap: _onAcceptOrderTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          color: const Color(0xFFF2F8F5),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Update Order Details!',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Manoj Kumar',
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Order: 123456789',
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
+    return Consumer<DashboardProvider>(
+      builder: (context, provider, _) {
+        final currentOrderStatus = provider.data?.currentOrderStatus ?? '';
+        return GestureDetector(
+          onTap: () => _onAcceptOrderTap(currentOrderStatus),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              color: const Color(0xFFF2F8F5),
+              borderRadius: BorderRadius.circular(16),
             ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: Color(0xFF4CAF50),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.double_arrow_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Update Order Details!',
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      /// 🔥 Dynamic message based on currentOrderStatus
+                      Builder(
+                        builder: (_) {
+                          final status = (currentOrderStatus ?? '')
+                              .trim(); // ensure safe
+
+                          String message;
+
+                          if (status == 'Rider Accepted') {
+                            message =
+                                'Hi Manoj Kumar, You have an accepted order.';
+                          } else if (status == 'Picked') {
+                            message = 'You have a picked order.';
+                          } else {
+                            message = 'You have no orders.';
+                          }
+
+                          return Text(
+                            message,
+                            style: const TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF4CAF50),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.double_arrow_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -2805,37 +2855,37 @@ class _HomeScreenState extends State<HomeScreen>
                     color: Colors.black,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => _showFilterMenu(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _getFilterLabel(provider.filter),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 18,
-                          color: Colors.grey.shade700,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () => _showFilterMenu(context),
+                //   child: Container(
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 12,
+                //       vertical: 6,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       border: Border.all(color: Colors.grey.shade300),
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //     child: Row(
+                //       mainAxisSize: MainAxisSize.min,
+                //       children: [
+                //         Text(
+                //           _getFilterLabel(provider.filter),
+                //           style: const TextStyle(
+                //             fontSize: 13,
+                //             color: Colors.black87,
+                //           ),
+                //         ),
+                //         const SizedBox(width: 4),
+                //         Icon(
+                //           Icons.keyboard_arrow_down,
+                //           size: 18,
+                //           color: Colors.grey.shade700,
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(height: 16),

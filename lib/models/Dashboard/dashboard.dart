@@ -28,6 +28,7 @@ class DashboardData {
   final double weekEarnings;
   final double monthEarnings;
   final List<DailyEarning> dailyEarnings;
+  String? currentOrderStatus;
 
   DashboardData({
     required this.completedOrdersCount,
@@ -38,6 +39,7 @@ class DashboardData {
     required this.weekEarnings,
     required this.monthEarnings,
     required this.dailyEarnings,
+    this.currentOrderStatus
   });
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,7 @@ class DashboardData {
       weekEarnings: (json['weekEarnings'] is num) ? (json['weekEarnings'] as num).toDouble() : 0.0,
       monthEarnings: (json['monthEarnings'] is num) ? (json['monthEarnings'] as num).toDouble() : 0.0,
       dailyEarnings: list.map((e) => DailyEarning.fromJson(e as Map<String,dynamic>)).toList(),
+      currentOrderStatus:  (json['currentOrderStatus']) ?? ''
     );
   }
 }

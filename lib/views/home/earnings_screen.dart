@@ -463,23 +463,23 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'This Week',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.grey[700]),
-                            ],
-                          ),
-                        ),
+                        // Container(
+                        //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        //   decoration: BoxDecoration(
+                        //     border: Border.all(color: Colors.grey[300]!),
+                        //     borderRadius: BorderRadius.circular(6),
+                        //   ),
+                        //   child: Row(
+                        //     children: [
+                        //       const Text(
+                        //         'This Week',
+                        //         style: TextStyle(fontSize: 12),
+                        //       ),
+                        //       const SizedBox(width: 4),
+                        //       Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.grey[700]),
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                     const SizedBox(height: 16),

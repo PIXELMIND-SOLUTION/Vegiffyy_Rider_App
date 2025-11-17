@@ -513,6 +513,8 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {
       _isSaving = true;
     });
+print("ooooooooooooooooooooooooooooooooo$name");
+print("ooooooooooooooooooooooooooooooooo$email");
 
     final ok = await provider.updateProfile(fullName: name, email: email.isEmpty ? null : email);
 
