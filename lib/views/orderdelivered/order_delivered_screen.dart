@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:veggify_delivery_app/models/Order/picked_order_model.dart';
 import 'package:veggify_delivery_app/provider/PickedOrder/picked_order_provider.dart';
+import 'package:veggify_delivery_app/utils/session_manager.dart';
 import 'package:veggify_delivery_app/views/chat/chat_screen.dart';
 import 'package:veggify_delivery_app/views/confirm/confirm_order.dart';
 import 'package:http/http.dart' as http;
@@ -23,11 +24,13 @@ class _OrderDeliveredScreenState extends State<OrderDeliveredScreen> {
   String? _qrCodeData;
   bool _isGeneratingQR = false;
   bool _isDeliveringOrder = false;
+  String? riderId;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback( (_)async {
+    riderId = await SessionManager.getUserId();
       final prov = Provider.of<PickedOrderProvider>(context, listen: false);
       prov.fetchPickedOrders().whenComplete(() {
         if (mounted) setState(() => _loadingLocal = false);
@@ -186,7 +189,16 @@ print("Response status code: ${response.statusCode}");
                             child: _buildActionButton(
                               icon: Icons.chat_bubble_outline,
                               label: 'Chat',
-                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen())),
+                              onTap: () =>                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(
+                          deliveryBoyId: riderId.toString(),
+                          userId: order?.userId?['_id'] ?? '',
+                          title: 'Chat with Rider',
+                        ),
+                      ),
+                    )
                             ),
                           ),
                           const SizedBox(width: 12),

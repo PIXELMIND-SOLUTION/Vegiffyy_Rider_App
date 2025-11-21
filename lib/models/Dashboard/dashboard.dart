@@ -45,7 +45,7 @@ class DashboardData {
   factory DashboardData.fromJson(Map<String, dynamic> json) {
     final list = (json['dailyEarnings'] as List<dynamic>?) ?? [];
     return DashboardData(
-      completedOrdersCount: (json['completedOrdersCount'] is int)
+      completedOrdersCount: (json['completedOrdersCount'] is int) 
           ? json['completedOrdersCount'] as int
           : int.tryParse(json['completedOrdersCount']?.toString() ?? '0') ?? 0,
       todayOrdersCount: (json['todayOrdersCount'] is int)

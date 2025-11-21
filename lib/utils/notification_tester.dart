@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:veggify_delivery_app/global/notification_service.dart';
 import 'package:veggify_delivery_app/models/Order/pending_order_model.dart';
+import 'package:veggify_delivery_app/provider/Dashboard/dashboard_provider.dart';
 import 'package:veggify_delivery_app/provider/PendingOrder/new_order_provider.dart';
 import 'package:veggify_delivery_app/provider/RiderStatus/delivery_status_provider.dart';
 import 'package:veggify_delivery_app/services/PendingOrder/pending_order_service.dart';
@@ -65,6 +66,8 @@ class _NotificationTesterState extends State<NotificationTester> {
       if (id == null || id.isEmpty) return;
 
       final ordersJson = await NewOrderService.fetchOrders(id);
+      final dashboardProvider = Provider.of<DashboardProvider>(context, listen: false);
+
       // service returns list; provider can also be notified
       final prov = Provider.of<NewOrderProvider>(context, listen: false);
       final newOrders = ordersJson.map((e) => PendingOrder.fromJson(e)).toList();
@@ -83,7 +86,7 @@ class _NotificationTesterState extends State<NotificationTester> {
           orderData: first.toMap(),
           onAccept: (orderData) async {
             // call accept in provider
-            await prov.acceptOrder(first.id);
+            await prov.acceptOrder(first.id,dashboardProvider: dashboardProvider);
           },
           onReject: (orderData) async {
             await prov.rejectOrder(first.id);

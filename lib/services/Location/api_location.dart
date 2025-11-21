@@ -11,6 +11,8 @@ class ApiLocationService {
   }) async {
     try {
       final uri = Uri.parse(ApiConstant.location(userId));
+print("kkkkkkkkkkkkkkkkkkkkkkkkkk$userId");
+print("kkkkkkkkkkkkkkkkkkkkkkkkkk$uri");
 
       final response = await http.put(
         uri,

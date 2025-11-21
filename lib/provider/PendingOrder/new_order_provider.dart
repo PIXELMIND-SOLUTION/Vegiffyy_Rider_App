@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:veggify_delivery_app/provider/Dashboard/dashboard_provider.dart';
 
 class NewOrderService {
   static const String baseUrl = 'http://31.97.206.144:5051'; // adjust if different
@@ -52,4 +53,22 @@ class NewOrderService {
     final json = jsonDecode(resp.body) as Map<String, dynamic>;
     return json;
   }
+
+
+  Future<void> acceptAndRefreshDashboard({
+  required String orderId,
+  required String deliveryBoyId,
+  required DashboardProvider dashboardProvider,
+}) async {
+  try {
+    await NewOrderService.acceptOrder(orderId, deliveryBoyId);
+
+    // Now reload dashboard
+    await dashboardProvider.loadDashboard(deliveryBoyId);
+
+  } catch (e) {
+    rethrow;
+  }
+}
+
 }

@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:veggify_delivery_app/models/Order/pending_order_model.dart';
+import 'package:veggify_delivery_app/provider/Dashboard/dashboard_provider.dart';
 import 'package:veggify_delivery_app/provider/PendingOrder/new_order_provider.dart';
 import 'package:veggify_delivery_app/utils/session_manager.dart';
 
@@ -56,23 +57,48 @@ class NewOrderProvider extends ChangeNotifier {
   }
 
   /// Accept order - calls API and updates local list
-  Future<bool> acceptOrder(String orderId, {String? deliveryBoyId}) async {
-    _setState(NewOrderState.submitting);
-    try {
-      final id = deliveryBoyId ?? await SessionManager.getUserId();
-      if (id == null || id.isEmpty) throw Exception('User id missing');
-      final resp = await NewOrderService.acceptOrder(orderId, id);
-      // remove from pending locally
-      _pendingOrders.removeWhere((o) => o.id == orderId);
-      _notifiedOrderIds.remove(orderId);
-      notifyListeners();
-      _setState(NewOrderState.loaded);
-      return (resp['success'] == true);
-    } catch (e) {
-      _setState(NewOrderState.error, err: e.toString());
-      return false;
+  // Future<bool> acceptOrder(String orderId, {String? deliveryBoyId}) async {
+  //   _setState(NewOrderState.submitting);
+  //   try {
+  //     final id = deliveryBoyId ?? await SessionManager.getUserId();
+  //     if (id == null || id.isEmpty) throw Exception('User id missing');
+  //     final resp = await NewOrderService.acceptOrder(orderId, id);
+  //     // remove from pending locally
+  //     _pendingOrders.removeWhere((o) => o.id == orderId);
+  //     _notifiedOrderIds.remove(orderId);
+  //     notifyListeners();
+  //     _setState(NewOrderState.loaded);
+  //     return (resp['success'] == true);
+  //   } catch (e) {
+  //     _setState(NewOrderState.error, err: e.toString());
+  //     return false;
+  //   }
+  // }
+
+
+  Future<bool> acceptOrder(
+  String orderId, {
+  required DashboardProvider dashboardProvider,
+}) async {
+  try {
+          final id = await SessionManager.getUserId();
+
+    final result = await NewOrderService.acceptOrder(orderId, id.toString());
+
+    if (result['success'] == true) {
+      // refresh dashboard after accepting
+      await dashboardProvider.loadDashboard( id.toString());
+
+      return true;
     }
+
+    return false;
+  } catch (e) {
+    debugPrint("Accept error: $e");
+    return false;
   }
+}
+
 
   /// Reject order
   Future<bool> rejectOrder(String orderId, {String? deliveryBoyId}) async {

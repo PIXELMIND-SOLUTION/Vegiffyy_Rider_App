@@ -34,7 +34,7 @@ class _OrderPickupScreenState extends State<OrderPickupScreen> {
 
     if (ok) {
       if (!mounted) return;
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OrderDeliveredScreen(order: order)));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OrderDeliveredScreen()));
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
