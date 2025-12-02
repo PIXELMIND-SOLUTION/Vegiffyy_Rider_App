@@ -8,6 +8,7 @@ import 'package:veggify_delivery_app/views/hystory/order_hystory_screen.dart';
 import 'package:veggify_delivery_app/views/profile/edit_profile.dart';
 import 'package:veggify_delivery_app/global/toast.dart';
 import 'package:veggify_delivery_app/views/auth/login_screen.dart';
+import 'package:veggify_delivery_app/views/profile/settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -184,11 +185,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfile()));
                   },
                 ),
-                _buildProfileTile(
+                                _buildProfileTile(
                   icon: Icons.history,
                   title: 'Order History',
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => OrderHistoryScreen()));
+                  },
+                ),
+                _buildProfileTile(
+                  icon: Icons.history,
+                  title: 'Settings',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LocationSettingsScreen()));
                   },
                 ),
                 const SizedBox(height: 10),

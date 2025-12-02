@@ -74,8 +74,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildBubble(ChatMessage msg) {
+    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkhhhhhhhhhh${msg.senderType.toLowerCase()}");
     final isUser = msg.senderType.toLowerCase() != 'rider';
-    final alignment = isUser ? MainAxisAlignment.end : MainAxisAlignment.start;
+    final alignment = isUser ? MainAxisAlignment.start : MainAxisAlignment.end;
     final bg = isUser ? Colors.green[50] : Colors.grey.shade200;
     final textColor = Colors.black87;
     final radius = BorderRadius.only(

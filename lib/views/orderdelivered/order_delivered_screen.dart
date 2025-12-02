@@ -8,6 +8,7 @@ import 'package:veggify_delivery_app/views/chat/chat_screen.dart';
 import 'package:veggify_delivery_app/views/confirm/confirm_order.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:veggify_delivery_app/views/navbar/navbar_screen.dart';
 
@@ -68,7 +69,7 @@ print("Response status code: ${response.statusCode}");
   Future<void> _markOrderDelivered(PickedOrderModel order) async {
     setState(() => _isDeliveringOrder = true);
     try {
-      final deliveryBoyId = order.deliveryBoy?['_id'] ?? '';
+      final deliveryBoyId = order.deliveryBoyId?.id ?? '';
       
       Map<String, dynamic> body = {
         'deliveryBoyId': deliveryBoyId,
@@ -110,6 +111,74 @@ print("Response status code: ${response.statusCode}");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+
+    Future<void> _openGoogleMaps(dynamic lg, dynamic lt) async {
+    try {
+      print("kkkkkkkkkkkkkkkk$lg");
+            print("kkkkkkkkkkkkkkkk$lt");
+
+      if (lt != null && lg != null) {
+
+        final String googleMapsUrl =
+            'https://www.google.com/maps/search/?api=1&query=$lt,$lg';
+
+        final String googleMapsAppUrl =
+            'google.navigation:q=$lt,$lg';
+
+        bool launched = false;
+
+        try {
+          launched = await launchUrl(
+            Uri.parse(googleMapsAppUrl),
+            mode: LaunchMode.externalApplication,
+          );
+        } catch (e) {
+          print('Could not launch Google Maps app: $e');
+        }
+
+        if (!launched) {
+          launched = await launchUrl(
+            Uri.parse(googleMapsUrl),
+            mode: LaunchMode.externalApplication,
+          );
+        }
+
+        if (!launched) {
+          _showErrorSnackbar(
+            'Could not open Google Maps. Please check if you have Google Maps installed.',
+          );
+        }
+      } else {
+        _showErrorSnackbar('Location coordinates are not available.');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to open Google Maps: $e');
+    }
+  }
+
+    void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: EdgeInsets.all(16),
+      ),
+    );
+  }
+
+
+    Future<void> _launchPhone(String phone) async {
+    final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Cannot call $phone')));
+    }
   }
 
   @override
@@ -169,12 +238,12 @@ print("Response status code: ${response.statusCode}");
                       const SizedBox(height: 16),
                       // Customer name
                       Text(
-                        order?.deliveryBoy?['fullName'] ?? 'Customer',
+                        order?.deliveryBoyId?.fullName ?? 'Customer',
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       // Address
-                      Text(order?.deliveryAddress ?? 'Address not available', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                      Text(order?.deliveryAddress?.street ?? 'Address not available', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                       const SizedBox(height: 4),
                       // Order ID
                       Text('Order: ${order?.id ?? 'N/A'}', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
@@ -183,7 +252,10 @@ print("Response status code: ${response.statusCode}");
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(child: _buildActionButton(icon: Icons.call_outlined, label: 'Call', onTap: () {})),
+                          Expanded(child: _buildActionButton(icon: Icons.call_outlined, label: 'Call', onTap: () {
+                                                  _launchPhone(order?.deliveryBoyId?.mobileNumber ?? '');
+
+                          })),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildActionButton(
@@ -194,15 +266,17 @@ print("Response status code: ${response.statusCode}");
                       MaterialPageRoute(
                         builder: (_) => ChatScreen(
                           deliveryBoyId: riderId.toString(),
-                          userId: order?.userId?['_id'] ?? '',
-                          title: 'Chat with Rider',
+                          userId: order?.userId?.id ?? '',
+                          title: 'Chat with User',
                         ),
                       ),
                     )
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(child: _buildActionButton(icon: Icons.map_outlined, label: 'Map', onTap: () {})),
+                          Expanded(child: _buildActionButton(icon: Icons.map_outlined, label: 'Map', onTap: () {
+                            _openGoogleMaps(order?.deliveryAddress?.location?.coordinates[0] ?? 0.0,order?.deliveryAddress?.location?.coordinates[1] ?? 0.0);
+                          })),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -307,7 +381,7 @@ print("Response status code: ${response.statusCode}");
                       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                         const Text('Total Paid', style: TextStyle(fontSize: 14, color: Colors.green, fontWeight: FontWeight.w600)),
                         Text(
-                          order != null ? '₹${order.totalPayable.toStringAsFixed(2)}' : '₹0.00', 
+                          order != null ? '₹${order.totalPayable?.toStringAsFixed(2)}' : '₹0.00', 
                           style: const TextStyle(fontSize: 14, color: Colors.green, fontWeight: FontWeight.w600)
                         ),
                       ]),

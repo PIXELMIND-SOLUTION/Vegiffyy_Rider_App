@@ -23,7 +23,7 @@ class ChatMessage {
       id: json['_id']?.toString() ?? '',
       deliveryBoyId: json['deliveryBoyId']?.toString() ?? '',
       userId: json['userId']?.toString() ?? '',
-      senderType: json['senderType']?.toString() ?? 'user',
+      senderType: json['senderType']?.toString() ?? 'rider',
       message: json['message']?.toString() ?? '',
       timestamp: ts.toLocal(),
     );

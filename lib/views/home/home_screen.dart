@@ -176,84 +176,75 @@ class _HomeScreenState extends State<HomeScreen>
     return "Location";
   }
 
-  Widget _buildLocationWidget({required VoidCallback onLocationTap}) {
+  Widget _buildLocationWidget() {
     return Consumer<LocationProvider>(
       builder: (context, provider, _) {
         final address = provider.address ?? '';
-        return GestureDetector(
-          onTap: onLocationTap,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.telegram_sharp, size: 24, color: Colors.green),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (provider.isLoading)
-                      SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: const Color(0xFF120698),
-                        ),
-                      )
-                    else
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  _getDisplayAddress(address),
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 20,
-                                color: Colors.black,
-                              ),
-                            ],
-                          ),
-                          Text(
-                            address.isNotEmpty ? address : "Set location",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ],
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.telegram_sharp, size: 24, color: Colors.green),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (provider.isLoading)
+                    SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: const Color(0xFF120698),
                       ),
-                  ],
-                ),
+                    )
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                _getDisplayAddress(address),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // const SizedBox(width: 4),
+                            // Icon(
+                            //   Icons.keyboard_arrow_down,
+                            //   size: 20,
+                            //   color: Colors.black,
+                            // ),
+                          ],
+                        ),
+                        Text(
+                          address.isNotEmpty ? address : "Set location",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
   }
 
-  void _onLocationTap() {
-    try {
-      Navigator.pushNamed(context, '/location_search');
-    } catch (e) {
-      GlobalToast.showInfo('Open location picker');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +301,6 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildLocationWidget(
-                          onLocationTap: _onLocationTap,
                         ),
                       ),
                       const SizedBox(width: 8),
