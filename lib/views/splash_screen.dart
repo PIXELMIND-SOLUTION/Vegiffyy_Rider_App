@@ -12,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
   late final Animation<double> _scaleAnim;
 
@@ -57,7 +58,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         // go to Home and remove all previous routes
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) => const NavbarScreen(initialIndex: 0)),
+          MaterialPageRoute(
+            builder: (_) => const NavbarScreen(initialIndex: 0),
+          ),
           (Route<dynamic> route) => false,
         );
       } else {
@@ -100,46 +103,77 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ScaleTransition(
-                  scale: _scaleAnim,
-                  child: Image.asset(
-                    'assets/logo.png',
-                    width: 260,
-                    fit: BoxFit.contain,
-                  ),
+                    Image.asset(
+                  'assets/logo.png',
+                  width: 300,
+                  fit: BoxFit.contain,
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 100),
+                    Text(
+                      'Pure Vegiterian',
+                      style: const TextStyle(
+                        fontFamily: 'Cursive',
+                        fontWeight: FontWeight.w900,
+                        fontSize: 50,
+                        letterSpacing: 1.5,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black26,
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
 
-                // optional subtitle
+                                const SizedBox(height: 100),
+
+
+                // POWERED BY TEXT
                 const Text(
                   "Powered by Nemishhrree",
                   style: TextStyle(
                     color: Color(0xFFEDEDED),
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
+                // OPERATED BY TEXT
                 const Text(
                   "Operated by JEIPLX",
                   style: TextStyle(
                     color: Color(0xFFEDEDED),
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
-                const SizedBox(height: 36),
+                                                const SizedBox(height: 8),
 
-                // small linear progress for feedback
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                  child: LinearProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                    backgroundColor: Colors.white.withOpacity(0.12),
+                // OPERATED BY TEXT
+                const Text(
+                  "Join Indis's First Pure Vegetarian Food Delivery",
+                  style: TextStyle(
+                    color: Color(0xFFEDEDED),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                                                                const SizedBox(height: 4),
+
+                // OPERATED BY TEXT
+                const Text(
+                  "Revolution!",
+                  style: TextStyle(
+                    color: Color(0xFFEDEDED),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],

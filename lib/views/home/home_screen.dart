@@ -30,6 +30,10 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _initializeData();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<ProfileProvider>();
+      provider.loadProfile();
+    });
   }
 
   // Initialize userId and location
