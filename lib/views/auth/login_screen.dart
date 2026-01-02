@@ -1,6 +1,7 @@
 // lib/views/auth/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veggify_delivery_app/provider/Auth/login_provider.dart';
 import 'package:veggify_delivery_app/views/auth/otp_screen.dart';
 import 'package:veggify_delivery_app/global/toast.dart';
@@ -275,7 +276,46 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
+
+                                    Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+            onTap: () async {
+        final uri = Uri.parse("https://pixelmindsolutions.com");
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+                child:RichText(
+          text: TextSpan(
+            style: const TextStyle(fontSize: 12),
+            children: [
+              TextSpan(
+                text: "Powered by ",
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.6),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextSpan(
+                text: "Pixelmindsolutions Pvt Ltd",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      
+              ),
+            ],
+          ),
               ],
             ),
           ),

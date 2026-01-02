@@ -1,6 +1,239 @@
+// // lib/views/orderpickup/order_pickup_screen.dart
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:veggify_delivery_app/models/Order/accepted_order_model.dart';
+// import 'package:veggify_delivery_app/provider/AcceptedOrder/accepted_order_provider.dart';
+// import 'package:veggify_delivery_app/views/orderdelivered/order_delivered_screen.dart';
+
+// class OrderPickupScreen extends StatefulWidget {
+//   const OrderPickupScreen({super.key});
+
+//   @override
+//   State<OrderPickupScreen> createState() => _OrderPickupScreenState();
+// }
+
+// class _OrderPickupScreenState extends State<OrderPickupScreen> {
+//   bool _submitting = false;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Call provider to fetch accepted orders after first frame
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       final prov = Provider.of<AcceptedOrderProvider>(context, listen: false);
+//       prov.fetchAcceptedOrders();
+//     });
+//   }
+
+//   Future<void> _onPickupPressed(String id) async {
+//     setState(() => _submitting = true);
+//     final prov = Provider.of<AcceptedOrderProvider>(context, listen: false);
+
+//     final ok = await prov.acceptPickup(id);
+//     setState(() => _submitting = false);
+
+//     if (ok) {
+//       if (!mounted) return;
+//       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OrderDeliveredScreen()));
+//     } else {
+//       if (!mounted) return;
+//       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+//         content: Text('Failed to mark as picked'),
+//         backgroundColor: Colors.red,
+//       ));
+//     }
+//   }
+
+//   Widget _buildOrderItemFromProduct(AcceptedOrderModel p) {
+//     return Container(
+//       decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+//       padding: const EdgeInsets.all(8),
+//       child: Row(
+//         children: [
+//           ClipRRect(
+//             borderRadius: BorderRadius.circular(10),
+//             child: p.image != null && p.image!.isNotEmpty
+//                 ? Image.network(p.image!, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover))
+//                 : Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover),
+//           ),
+//           const SizedBox(width: 10),
+//           Expanded(
+//             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//               Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+//               const SizedBox(height: 4),
+//               Text('Qty: ${p.quantity}', style: const TextStyle(color: Colors.grey)),
+//             ]),
+//           ),
+//           Container(
+//             width: 16,
+//             height: 16,
+//             decoration: BoxDecoration(border: Border.all(color: Colors.green, width: 2), borderRadius: BorderRadius.circular(4)),
+//             child: Center(child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildOrderItemPlaceholder() {
+//     return Container(
+//       decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+//       padding: const EdgeInsets.all(8),
+//       child: Row(children: [
+//         ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover)),
+//         const SizedBox(width: 10),
+//         const Expanded(
+//             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           Text('Veg panner fried rice', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+//           SizedBox(height: 4),
+//           Text('Qty: 1 Full', style: TextStyle(color: Colors.grey)),
+//         ])),
+//         Container(
+//           width: 16,
+//           height: 16,
+//           decoration: BoxDecoration(border: Border.all(color: Colors.green, width: 2), borderRadius: BorderRadius.circular(4)),
+//           child: Center(child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
+//         ),
+//       ]),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // UI layout preserved — content driven by provider via Consumer
+//     return Scaffold(
+//       body: Stack(
+//         children: [
+//           SizedBox(width: double.infinity, height: double.infinity, child: Image.asset('assets/map.png', fit: BoxFit.cover)),
+//           Column(
+//             children: [
+//               const SizedBox(height: 40),
+//               Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0), child: Row(children: [
+//                 GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back_ios_new, color: Colors.black)),
+//               ])),
+//               const SizedBox(height: 250),
+//               Expanded(
+//                 child: Container(
+//                   width: double.infinity,
+//                   margin: const EdgeInsets.only(top: 20),
+//                   padding: const EdgeInsets.all(16),
+//                   decoration: const BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+//                     boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+//                   ),
+//                   child: Consumer<AcceptedOrderProvider>(
+//                     builder: (context, prov, _) {
+//                       if (prov.state == AcceptedOrderState.loading) {
+//                         return const Center(child: CircularProgressIndicator());
+//                       }
+
+//                       if (prov.state == AcceptedOrderState.error) {
+//                         return Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Center(
+//                               child: Container(
+//                                 decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
+//                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+//                                 child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 16),
+//                             Text(prov.error ?? 'Failed to load orders', style: const TextStyle(color: Colors.red)),
+//                             const SizedBox(height: 16),
+//                             ElevatedButton(onPressed: () => prov.fetchAcceptedOrders(), child: const Text('Retry')),
+//                           ],
+//                         );
+//                       }
+
+//                       if (prov.acceptedOrders.isEmpty) {
+//                         return Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Center(
+//                               child: Container(
+//                                 decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
+//                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+//                                 child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 16),
+//                             const Text('No accepted orders available', style: TextStyle(fontSize: 16)),
+//                             const SizedBox(height: 12),
+//                             _buildOrderItemPlaceholder(),
+//                             const SizedBox(height: 10),
+//                             _buildOrderItemPlaceholder(),
+//                           ],
+//                         );
+//                       }
+
+//                       // use first accepted order
+//                       final order = prov.acceptedOrders.first;
+//                       final products = order.products;
+
+//                       return Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Center(
+//                             child: Container(
+//                               decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
+//                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+//                               child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+//                             ),
+//                           ),
+//                           const SizedBox(height: 16),
+//                           if (products.isNotEmpty) ...[
+//                             _buildOrderItemFromProduct(products[0]),
+//                             const SizedBox(height: 10),
+//                             if (products.length > 1) _buildOrderItemFromProduct(products[1]),
+//                           ] else ...[
+//                             _buildOrderItemPlaceholder(),
+//                             const SizedBox(height: 10),
+//                             _buildOrderItemPlaceholder(),
+//                           ],
+//                           const Spacer(),
+//                           SizedBox(
+//                             width: double.infinity,
+//                             height: 50,
+//                             child: ElevatedButton(
+//                               onPressed: (_submitting) ? null : () => _onPickupPressed(order.id),
+//                               style: ElevatedButton.styleFrom(
+//                                 backgroundColor: const Color(0xFF4CAF50),
+//                                 foregroundColor: Colors.white,
+//                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+//                                 padding: const EdgeInsets.symmetric(horizontal: 8),
+//                               ),
+//                               child: _submitting
+//                                   ? const CircularProgressIndicator(color: Colors.white)
+//                                   : Row(
+//                                       mainAxisAlignment: MainAxisAlignment.start,
+//                                       children: [
+//                                         Container(width: 34, height: 34, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.keyboard_double_arrow_right, color: Color(0xFF4CAF50), size: 20)),
+//                                         const Expanded(child: Text('Order Pickup', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+//                                         const SizedBox(width: 34),
+//                                       ],
+//                                     ),
+//                             ),
+//                           ),
+//                         ],
+//                       );
+//                     },
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 // lib/views/orderpickup/order_pickup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veggify_delivery_app/models/Order/accepted_order_model.dart';
 import 'package:veggify_delivery_app/provider/AcceptedOrder/accepted_order_provider.dart';
 import 'package:veggify_delivery_app/views/orderdelivered/order_delivered_screen.dart';
@@ -25,6 +258,50 @@ class _OrderPickupScreenState extends State<OrderPickupScreen> {
     });
   }
 
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  Future<void> _openGoogleMaps(dynamic lng, dynamic lat) async {
+    try {
+      if (lat != null && lng != null) {
+        final String googleMapsUrl =
+            'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+        final String googleMapsAppUrl = 'google.navigation:q=$lat,$lng';
+
+        bool launched = false;
+
+        try {
+          launched = await launchUrl(
+            Uri.parse(googleMapsAppUrl),
+            mode: LaunchMode.externalApplication,
+          );
+        } catch (e) {
+          // ignore app fail, will fallback to browser
+        }
+
+        if (!launched) {
+          launched = await launchUrl(
+            Uri.parse(googleMapsUrl),
+            mode: LaunchMode.externalApplication,
+          );
+        }
+
+        if (!launched) {
+          _showErrorSnackbar(
+            'Could not open Google Maps. Please check if you have Google Maps installed.',
+          );
+        }
+      } else {
+        _showErrorSnackbar('Location coordinates are not available.');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to open Google Maps: $e');
+    }
+  }
+
   Future<void> _onPickupPressed(String id) async {
     setState(() => _submitting = true);
     final prov = Provider.of<AcceptedOrderProvider>(context, listen: false);
@@ -34,41 +311,90 @@ class _OrderPickupScreenState extends State<OrderPickupScreen> {
 
     if (ok) {
       if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OrderDeliveredScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OrderDeliveredScreen()),
+      );
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Failed to mark as picked'),
-        backgroundColor: Colors.red,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to mark as picked'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   Widget _buildOrderItemFromProduct(AcceptedOrderModel p) {
     return Container(
-      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: p.image != null && p.image!.isNotEmpty
-                ? Image.network(p.image!, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover))
-                : Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover),
+                ? Image.network(
+                    p.image!,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      'assets/biriyani.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    'assets/biriyani.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 4),
-              Text('Qty: ${p.quantity}', style: const TextStyle(color: Colors.grey)),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Qty: ${p.quantity}',
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
           ),
           Container(
             width: 16,
             height: 16,
-            decoration: BoxDecoration(border: Border.all(color: Colors.green, width: 2), borderRadius: BorderRadius.circular(4)),
-            child: Center(child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.green, width: 2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Center(
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -77,151 +403,440 @@ class _OrderPickupScreenState extends State<OrderPickupScreen> {
 
   Widget _buildOrderItemPlaceholder() {
     return Container(
-      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
       padding: const EdgeInsets.all(8),
-      child: Row(children: [
-        ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/biriyani.png', width: 60, height: 60, fit: BoxFit.cover)),
-        const SizedBox(width: 10),
-        const Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Veg panner fried rice', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          SizedBox(height: 4),
-          Text('Qty: 1 Full', style: TextStyle(color: Colors.grey)),
-        ])),
-        Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(border: Border.all(color: Colors.green, width: 2), borderRadius: BorderRadius.circular(4)),
-          child: Center(child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle))),
-        ),
-      ]),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              'assets/biriyani.png',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Veg panner fried rice',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 4),
+                Text('Qty: 1 Full', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.green, width: 2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Center(
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// NEW: restaurant + map section
+  Widget _buildRestaurantSection(OrderModel order) {
+    final restaurantName = order.restaurantInfo?.restaurantName ?? 'Restaurant';
+    final restaurantArea = order.restaurantInfo?.locationName ?? '';
+    final customerAddress =
+        order.deliveryAddressFull?.street ?? order.deliveryAddress;
+
+    final restCoords = order.restaurantLocation?.coordinates; // [lng, lat]
+    final dropCoords =
+        order.deliveryAddressFull?.location?.coordinates; // [lng, lat]
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Restaurant info
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.store, color: Colors.green, size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      restaurantName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (restaurantArea.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        restaurantArea,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 18,
+                          color: Colors.orange,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            customerAddress,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Map preview
+          GestureDetector(
+            onTap: () {
+              if (restCoords != null && restCoords.length >= 2) {
+                _openGoogleMaps(restCoords[0], restCoords[1]); // lng, lat
+              } else {
+                _showErrorSnackbar('Restaurant location not available.');
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'assets/map.png',
+                    height: 130,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    height: 130,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.3),
+                          Colors.black.withOpacity(0.05),
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 12,
+                    right: 12,
+                    bottom: 10,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.directions,
+                            size: 18,
+                            color: Colors.green,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Tap to view pickup location in Google Maps',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    if (restCoords != null && restCoords.length >= 2) {
+                      _openGoogleMaps(restCoords[0], restCoords[1]);
+                    } else {
+                      _showErrorSnackbar('Restaurant location not available.');
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.store_mall_directory_outlined,
+                    size: 18,
+                    color: Colors.green,
+                  ),
+                  label: const Text(
+                    'Pickup (Restaurant)',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.green),
+                  ),
+                ),
+              ),
+              // const SizedBox(width: 8),
+              // Expanded(
+              //   child: OutlinedButton.icon(
+              //     onPressed: () {
+              //       if (dropCoords != null && dropCoords.length >= 2) {
+              //         _openGoogleMaps(dropCoords[0], dropCoords[1]);
+              //       } else {
+              //         _showErrorSnackbar('Drop location not available.');
+              //       }
+              //     },
+              //     icon: const Icon(
+              //       Icons.home_outlined,
+              //       size: 18,
+              //       color: Colors.blue,
+              //     ),
+              //     label: const Text(
+              //       'Drop (Customer)',
+              //       style: TextStyle(color: Colors.blue),
+              //     ),
+              //     style: OutlinedButton.styleFrom(
+              //       side: const BorderSide(color: Colors.blue),
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // UI layout preserved — content driven by provider via Consumer
     return Scaffold(
       body: Stack(
         children: [
-          SizedBox(width: double.infinity, height: double.infinity, child: Image.asset('assets/map.png', fit: BoxFit.cover)),
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Image.asset('assets/map.png', fit: BoxFit.cover),
+          ),
           Column(
             children: [
               const SizedBox(height: 40),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0), child: Row(children: [
-                GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back_ios_new, color: Colors.black)),
-              ])),
-              const SizedBox(height: 250),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(top: 20),
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
-                  ),
-                  child: Consumer<AcceptedOrderProvider>(
-                    builder: (context, prov, _) {
-                      if (prov.state == AcceptedOrderState.loading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (prov.state == AcceptedOrderState.error) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(
-                              child: Container(
-                                decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(prov.error ?? 'Failed to load orders', style: const TextStyle(color: Colors.red)),
-                            const SizedBox(height: 16),
-                            ElevatedButton(onPressed: () => prov.fetchAcceptedOrders(), child: const Text('Retry')),
-                          ],
-                        );
-                      }
-
-                      if (prov.acceptedOrders.isEmpty) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(
-                              child: Container(
-                                decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text('No accepted orders available', style: TextStyle(fontSize: 16)),
-                            const SizedBox(height: 12),
-                            _buildOrderItemPlaceholder(),
-                            const SizedBox(height: 10),
-                            _buildOrderItemPlaceholder(),
-                          ],
-                        );
-                      }
-
-                      // use first accepted order
-                      final order = prov.acceptedOrders.first;
-                      final products = order.products;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Container(
-                              decoration: BoxDecoration(border: Border.all(color: Colors.green), borderRadius: BorderRadius.circular(20)),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                              child: const Text('Order Details!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (products.isNotEmpty) ...[
-                            _buildOrderItemFromProduct(products[0]),
-                            const SizedBox(height: 10),
-                            if (products.length > 1) _buildOrderItemFromProduct(products[1]),
-                          ] else ...[
-                            _buildOrderItemPlaceholder(),
-                            const SizedBox(height: 10),
-                            _buildOrderItemPlaceholder(),
-                          ],
-                          const Spacer(),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: (_submitting) ? null : () => _onPickupPressed(order.id),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4CAF50),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              child: _submitting
-                                  ? const CircularProgressIndicator(color: Colors.white)
-                                  : Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Container(width: 34, height: 34, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.keyboard_double_arrow_right, color: Color(0xFF4CAF50), size: 20)),
-                                        const Expanded(child: Text('Order Pickup', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                                        const SizedBox(width: 34),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 120),
+Expanded(
+  child: Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(top: 20),
+    padding: const EdgeInsets.all(16),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(24),
+        topRight: Radius.circular(24),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 10,
+          offset: Offset(0, -2),
+        ),
+      ],
+    ),
+    child: Consumer<AcceptedOrderProvider>(
+      builder: (context, prov, _) {
+        if (prov.state == AcceptedOrderState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (prov.state == AcceptedOrderState.error) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // _headerTitle(),
+                const SizedBox(height: 16),
+                Text(
+                  prov.error ?? 'Failed to load orders',
+                  style: const TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => prov.fetchAcceptedOrders(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (prov.acceptedOrders.isEmpty) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // _headerTitle(),
+                const SizedBox(height: 16),
+                const Text(
+                  'No accepted orders available',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                _buildOrderItemPlaceholder(),
+                const SizedBox(height: 10),
+                _buildOrderItemPlaceholder(),
+              ],
+            ),
+          );
+        }
+
+        final OrderModel order = prov.acceptedOrders.first;
+        final products = order.products;
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // _headerTitle(),
+              const SizedBox(height: 16),
+
+              _buildRestaurantSection(order),
+
+              if (products.isNotEmpty) ...[
+                _buildOrderItemFromProduct(products[0]),
+
+                const SizedBox(height: 10),
+                if (products.length > 1)
+                  _buildOrderItemFromProduct(products[1]),
+              ] else ...[
+                _buildOrderItemPlaceholder(),
+                const SizedBox(height: 10),
+                _buildOrderItemPlaceholder(),
+              ],
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed:
+                      (_submitting) ? null : () => _onPickupPressed(order.id),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  child: _submitting
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Container(
+                            //   width: 34,
+                            //   height: 34,
+                            //   decoration: const BoxDecoration(
+                            //     color: Colors.white,
+                            //     shape: BoxShape.circle,
+                            //   ),
+                            //   child: const Icon(
+                            //     Icons.keyboard_double_arrow_right,
+                            //     color: Color(0xFF4CAF50),
+                            //     size: 20,
+                            //   ),
+                            // ),
+                            const Expanded(
+                              child: Text(
+                                'Order Pickup',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 34),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  ),
+)
+
             ],
           ),
         ],

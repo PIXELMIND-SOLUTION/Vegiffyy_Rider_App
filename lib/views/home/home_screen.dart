@@ -25,6 +25,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin {
   String userId = '';
+    String username = '';
+
 
   @override
   void initState() {
@@ -63,9 +65,12 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _loadUserId() async {
     try {
       final storedUserId = await SessionManager.getUserId();
+            final storedUsername = await SessionManager.getUserName();
+
       if (!mounted) return;
       setState(() {
         userId = storedUserId ?? '';
+        username = storedUsername ?? '';
       });
       debugPrint('Loaded userId: $userId');
     } catch (e) {
@@ -544,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                           if (status == 'Rider Accepted') {
                             message =
-                                'Hi Manoj Kumar, You have an accepted order.';
+                                'Hi $username, You have an accepted order.';
                           } else if (status == 'Picked') {
                             message = 'You have a picked order.';
                           } else {

@@ -78,9 +78,11 @@ Future<bool> verifyOtp(String mobile, String otp) async {
 
     if (deliveryBoy != null && token != null) {
       final userId = deliveryBoy["_id"]?.toString() ?? "";
+            final username = deliveryBoy["fullName"]?.toString() ?? "";
+
 
       // Save session
-      await SessionManager.saveSession(userId: userId, token: token);
+      await SessionManager.saveSession(userId: userId, token: token, name:username);
     }
 
     _setState(LoginState.loggedIn);

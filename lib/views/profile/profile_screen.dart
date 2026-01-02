@@ -8,7 +8,9 @@ import 'package:veggify_delivery_app/views/hystory/order_hystory_screen.dart';
 import 'package:veggify_delivery_app/views/profile/edit_profile.dart';
 import 'package:veggify_delivery_app/global/toast.dart';
 import 'package:veggify_delivery_app/views/auth/login_screen.dart';
+import 'package:veggify_delivery_app/views/profile/help_screen.dart';
 import 'package:veggify_delivery_app/views/profile/settings.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -66,6 +68,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> openWhatsApp(String phoneNumber, {String message = ""}) async {
+    // Remove spaces and ensure only digits
+    String cleanedNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
+
+    // If number is missing country code, add +91 by default
+    if (!cleanedNumber.startsWith("91") && cleanedNumber.length == 10) {
+      cleanedNumber = "91$cleanedNumber";
+    }
+
+    final String encodedMessage = Uri.encodeComponent(message);
+    final String url = "https://wa.me/$cleanedNumber?text=$encodedMessage";
+
+    final Uri uri = Uri.parse("lshdfkjdslfjdsl$url");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not launch WhatsApp";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,26 +99,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
         leading: const Icon(Icons.trending_up, color: Colors.black),
         title: const Text(
           'Profile',
-          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       body: Consumer<ProfileProvider>(
         builder: (context, provider, _) {
-          if (provider.state == ProfileState.loading || provider.profile == null) {
+          if (provider.state == ProfileState.loading ||
+              provider.profile == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (provider.state == ProfileState.error && provider.profile == null) {
+          if (provider.state == ProfileState.error &&
+              provider.profile == null) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Failed to load profile: ${provider.errorMessage ?? ''}'),
+                  Text(
+                    'Failed to load profile: ${provider.errorMessage ?? ''}',
+                  ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => provider.loadProfile(),
                     child: const Text('Retry'),
-                  )
+                  ),
                 ],
               ),
             );
@@ -117,7 +148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.grey.shade200,
                           backgroundImage: profile.profileImage != null
                               ? NetworkImage(profile.profileImage!)
-                              : const AssetImage('assets/home.png') as ImageProvider,
+                              : const AssetImage('assets/home.png')
+                                    as ImageProvider,
                         ),
                         Positioned(
                           bottom: 0,
@@ -130,43 +162,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 shape: BoxShape.circle,
                               ),
                               padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(profile.fullName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(
+                      profile.fullName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 6),
-                    Text(profile.email ?? '-', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                    Text(profile.mobileNumber, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text(
+                      profile.email ?? '-',
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    Text(
+                      profile.mobileNumber,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (profile.deliveryBoyStatus.isNotEmpty)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.orange.shade50,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               profile.deliveryBoyStatus,
-                              style: TextStyle(color: Colors.orange.shade700, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                color: Colors.orange.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             'Wallet ₹${profile.walletBalance.toStringAsFixed(0)}',
-                            style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -182,41 +242,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.person_outline,
                   title: 'Personal information',
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfile()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditProfile(),
+                      ),
+                    );
                   },
                 ),
-                                _buildProfileTile(
+                _buildProfileTile(
                   icon: Icons.history,
                   title: 'Order History',
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => OrderHistoryScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OrderHistoryScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildProfileTile(
                   icon: Icons.history,
                   title: 'Settings',
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => LocationSettingsScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LocationSettingsScreen(),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 10),
                 const Divider(),
                 const SizedBox(height: 10),
-                _buildProfileTile(icon: Icons.help_outline, title: 'Need Help?', onTap: () {}),
-                _buildProfileTile(icon: Icons.phone_outlined, title: 'Contact Us', onTap: () {}),
-                const SizedBox(height: 20),
+                _buildProfileTile(
+                  icon: Icons.help_outline,
+                  title: 'Need Help? Contact Wattsapp',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>HelpScreen()));
+                  },
+                ),
+                // _buildProfileTile(
+                //   icon: Icons.phone_outlined,
+                //   title: 'Contact Us',
+                //   onTap: () {},
+                // ),
+                // const SizedBox(height: 20),
                 // Logout Button
                 Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
                   child: ListTile(
                     leading: const Icon(Icons.logout, color: Colors.red),
-                    title: const Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-                    trailing: const Icon(Icons.arrow_forward_ios, color: Colors.red, size: 16),
+                    title: const Text(
+                      'Logout',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.red,
+                      size: 16,
+                    ),
                     onTap: _handleLogout,
                   ),
                 ),
                 const SizedBox(height: 24),
-                if (provider.state == ProfileState.updating) const LinearProgressIndicator(),
+                if (provider.state == ProfileState.updating)
+                  const LinearProgressIndicator(),
               ],
             ),
           );
@@ -232,11 +331,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
       child: ListTile(
         leading: Icon(icon, color: Colors.black),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.grey,
+          size: 16,
+        ),
         onTap: onTap,
       ),
     );

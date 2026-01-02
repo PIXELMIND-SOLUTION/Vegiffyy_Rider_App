@@ -457,12 +457,12 @@ print("Response status code: ${response.statusCode}");
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 34, 
-                        height: 34, 
-                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), 
-                        child: const Icon(Icons.keyboard_double_arrow_right, color: Color(0xFF4CAF50), size: 20)
-                      ),
+                      // Container(
+                      //   width: 34, 
+                      //   height: 34, 
+                      //   decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), 
+                      //   child: const Icon(Icons.keyboard_double_arrow_right, color: Color(0xFF4CAF50), size: 20)
+                      // ),
                       const Expanded(
                         child: Text(
                           'Order Delivered', 

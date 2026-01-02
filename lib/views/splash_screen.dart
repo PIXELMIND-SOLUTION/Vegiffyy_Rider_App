@@ -1,8 +1,10 @@
 // lib/views/auth/splash_screen.dart
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:veggify_delivery_app/utils/session_manager.dart';
+import 'package:veggify_delivery_app/views/amoders_loading.dart';
 import 'package:veggify_delivery_app/views/auth/login_screen.dart';
-import 'package:veggify_delivery_app/views/home/home_screen.dart';
 import 'package:veggify_delivery_app/views/navbar/navbar_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,40 +14,18 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _scaleAnim;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // small animation for polish
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-
-    _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
-    );
-
-    _animController.forward();
-
-    // start navigation check after a short delay to show splash nicely
     _navigate();
   }
 
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
-
+  // ------------------------------------------------
+  // SESSION + NAVIGATION
+  // ------------------------------------------------
   Future<void> _navigate() async {
-    // keep splash visible for at least 1200ms
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
@@ -54,24 +34,15 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (!mounted) return;
 
-      if (loggedIn) {
-        // go to Home and remove all previous routes
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const NavbarScreen(initialIndex: 0),
-          ),
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        // go to Login screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
-      }
-    } catch (e) {
-      // On error fallback to login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => loggedIn
+              ? const NavbarScreen(initialIndex: 0)
+              : const LoginScreen(),
+        ),
+      );
+    } catch (_) {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -80,106 +51,110 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  // ------------------------------------------------
+  // URL LAUNCHER
+  // ------------------------------------------------
+  Future<void> _openWebsite() async {
+    final uri = Uri.parse("https://pixelmindsolutions.com");
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF083F1A), // top dark green
-              Color(0xFF000000), // bottom blackish
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                    Image.asset(
-                  'assets/logo.png',
-                  width: 300,
-                  fit: BoxFit.contain,
-                ),
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
 
-                const SizedBox(height: 100),
-                    Text(
-                      'Pure Vegiterian',
-                      style: const TextStyle(
-                        fontFamily: 'Cursive',
-                        fontWeight: FontWeight.w900,
-                        fontSize: 50,
-                        letterSpacing: 1.5,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: Offset(2, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                                const SizedBox(height: 100),
-
-
-                // POWERED BY TEXT
-                const Text(
-                  "Powered by Nemishhrree",
-                  style: TextStyle(
-                    color: Color(0xFFEDEDED),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // OPERATED BY TEXT
-                const Text(
-                  "Operated by JEIPLX",
-                  style: TextStyle(
-                    color: Color(0xFFEDEDED),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                                                const SizedBox(height: 8),
-
-                // OPERATED BY TEXT
-                const Text(
-                  "Join Indis's First Pure Vegetarian Food Delivery",
-                  style: TextStyle(
-                    color: Color(0xFFEDEDED),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                                                                const SizedBox(height: 4),
-
-                // OPERATED BY TEXT
-                const Text(
-                  "Revolution!",
-                  style: TextStyle(
-                    color: Color(0xFFEDEDED),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+  // ------------------------------------------------
+  // POWERED BY BRANDING (BOTTOM)
+  // ------------------------------------------------
+  Widget _poweredByBranding() {
+    return Positioned(
+      bottom: 24 + MediaQuery.of(context).padding.bottom,
+      left: 0,
+      right: 0,
+      child: Column(
+        children: [
+          Text(
+            "Powered by",
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withOpacity(0.6),
+              letterSpacing: 1.5,
             ),
           ),
-        ),
+          const SizedBox(height: 6),
+
+          // ✅ CLICKABLE TEXT
+          GestureDetector(
+            onTap: _openWebsite,
+            child: Text(
+              "Pixelmindsolutions Pvt Ltd",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                decoration: TextDecoration.underline,
+                shadows: [
+                  Shadow(
+                    color: Colors.white.withOpacity(0.3),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------------------------------------
+  // UI
+  // ------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 🔥 FULL SCREEN BACKGROUND IMAGE
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/vegsplash.png'),
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+
+          // 🌑 DARK OVERLAY (DO NOT BLOCK TOUCH)
+          IgnorePointer(
+            ignoring: true,
+            child: Container(
+              color: Colors.black.withOpacity(0.25),
+            ),
+          ),
+
+          // ⏳ CENTER LOADER (DO NOT BLOCK TOUCH)
+          IgnorePointer(
+            ignoring: true,
+            child: SafeArea(
+              left: false,
+              right: false,
+              child: Column(
+                children: const [
+                  Spacer(),
+                  AmodersLoading(size: 45),
+                  Spacer(),
+                ],
+              ),
+            ),
+          ),
+
+          // ✅ CLICKABLE BRANDING ON TOP
+          _poweredByBranding(),
+        ],
       ),
     );
   }
