@@ -153,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
 
           // ✅ CLICKABLE BRANDING ON TOP
-          _poweredByBranding(),
+          // _poweredByBranding(),
         ],
       ),
     );
