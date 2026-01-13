@@ -385,7 +385,7 @@ class _HelpScreenState extends State<HelpScreen>
                     InkWell(
                       onTap: () {
                         openWhatsApp(
-                          "9666317749",
+                          "9391950503",
                           message: "Hello, I need help",
                         );
                       },
@@ -863,7 +863,7 @@ class _HelpScreenState extends State<HelpScreen>
       {
         'question': 'Is there a phone number for immediate support?',
         'answer':
-            'Yes, you can call us at 1800-XXX-XXXX for urgent matters. Our phone support is available 24/7.',
+            'Yes, you can call us at +916309100101 for urgent matters. Our phone support is available 24/7.',
       },
     ];
 
