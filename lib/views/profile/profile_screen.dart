@@ -56,6 +56,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _openPrivacyPolicy() async {
+  const String privacyUrl = 'https://vegiffy-rider-policies.onrender.com/privacy-and-policy';
+
+  final Uri uri = Uri.parse(privacyUrl);
+
+  if (!await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  )) {
+    GlobalToast.showError('Could not open Privacy Policy');
+  }
+}
+
+  Future<void> _openTerms() async {
+  const String privacyUrl = 'https://vegiffy-rider-policies.onrender.com/terms-and-conditions';
+
+  final Uri uri = Uri.parse(privacyUrl);
+
+  if (!await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  )) {
+    GlobalToast.showError('Could not open Terms % Use');
+  }
+}
+
+
   Future<void> _handleLogout() async {
     final provider = context.read<ProfileProvider>();
     await provider.logout();
@@ -262,8 +289,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   },
                 ),
+
                 _buildProfileTile(
-                  icon: Icons.history,
+  icon: Icons.privacy_tip_outlined,
+  title: 'Privacy Policy',
+  onTap: _openPrivacyPolicy,
+),
+
+                _buildProfileTile(
+  icon: Icons.privacy_tip_outlined,
+  title: 'Terms & Conditions',
+  onTap: _openTerms,
+),
+
+                _buildProfileTile(
+                  icon: Icons.settings,
                   title: 'Settings',
                   onTap: () {
                     Navigator.push(
