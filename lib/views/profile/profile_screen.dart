@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:veggify_delivery_app/constants/api_constant.dart';
 import 'package:veggify_delivery_app/provider/Profile/profile_provider.dart';
 import 'package:veggify_delivery_app/views/hystory/order_hystory_screen.dart';
 import 'package:veggify_delivery_app/views/profile/edit_profile.dart';
@@ -11,6 +12,9 @@ import 'package:veggify_delivery_app/views/auth/login_screen.dart';
 import 'package:veggify_delivery_app/views/profile/help_screen.dart';
 import 'package:veggify_delivery_app/views/profile/settings.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -115,6 +119,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
       throw "Could not launch WhatsApp";
     }
   }
+
+
+Future<void> _deleteMyAccount(String deliveryBoyId) async {
+  try {
+    GlobalToast.showSuccess('Deleting account...');
+
+    final uri = Uri.parse(
+      '${ApiConstant.baseUrl}/api/delivery-boy/deletemyaccount/$deliveryBoyId',
+    );
+
+    final response = await http.delete(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        // add auth if needed
+        // 'Authorization': 'Bearer YOUR_TOKEN',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      GlobalToast.showSuccess('Account deleted successfully');
+
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    } else {
+      final body = jsonDecode(response.body);
+      GlobalToast.showError(
+        body['message'] ?? 'Failed to delete account',
+      );
+    }
+  } catch (e) {
+    GlobalToast.showError('Something went wrong');
+  }
+}
+
+void _showDeleteAccountDialog(String deliveryBoyId) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text(
+          'Delete Account',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'Are you sure you want to delete your account?\n\n'
+          'This action is permanent and cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteMyAccount(deliveryBoyId);
+            },
+            child: const Text(
+              'Yes, Delete',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -314,6 +397,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   },
                 ),
+
+                _buildProfileTile(
+  icon: Icons.delete_forever_outlined,
+  title: 'Delete Account',
+  onTap: () {
+    _showDeleteAccountDialog(profile.id);
+  },
+),
+
                 const SizedBox(height: 10),
                 const Divider(),
                 const SizedBox(height: 10),

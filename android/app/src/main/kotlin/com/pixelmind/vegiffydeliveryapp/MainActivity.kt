@@ -1,4 +1,4 @@
-package com.example.veggify_delivery_app
+package com.pixelmind.vegiffydeliveryapp
 
 import io.flutter.embedding.android.FlutterActivity
 
