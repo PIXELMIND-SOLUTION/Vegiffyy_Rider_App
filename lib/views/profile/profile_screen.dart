@@ -385,18 +385,18 @@ void _showDeleteAccountDialog(String deliveryBoyId) {
   onTap: _openTerms,
 ),
 
-                _buildProfileTile(
-                  icon: Icons.settings,
-                  title: 'Settings',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LocationSettingsScreen(),
-                      ),
-                    );
-                  },
-                ),
+                // _buildProfileTile(
+                //   icon: Icons.settings,
+                //   title: 'Settings',
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => LocationSettingsScreen(),
+                //       ),
+                //     );
+                //   },
+                // ),
 
                 _buildProfileTile(
   icon: Icons.delete_forever_outlined,

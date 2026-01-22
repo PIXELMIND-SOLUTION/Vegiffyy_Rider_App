@@ -185,73 +185,139 @@ class _HomeScreenState extends State<HomeScreen>
     return "Location";
   }
 
+  // Widget _buildLocationWidget() {
+  //   return Consumer<LocationProvider>(
+  //     builder: (context, provider, _) {
+  //       final address = provider.address ?? '';
+  //       return Row(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Icon(Icons.telegram_sharp, size: 24, color: Colors.green),
+  //           const SizedBox(width: 8),
+  //           Expanded(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 if (provider.isLoading)
+  //                   SizedBox(
+  //                     width: 14,
+  //                     height: 14,
+  //                     child: CircularProgressIndicator(
+  //                       strokeWidth: 2,
+  //                       color: const Color(0xFF120698),
+  //                     ),
+  //                   )
+  //                 else
+  //                   Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Row(
+  //                         children: [
+  //                           Flexible(
+  //                             child: Text(
+  //                               _getDisplayAddress(address),
+  //                               style: const TextStyle(
+  //                                 fontSize: 18,
+  //                                 color: Colors.black,
+  //                                 fontWeight: FontWeight.bold,
+  //                               ),
+  //                               overflow: TextOverflow.ellipsis,
+  //                             ),
+  //                           ),
+  //                           // const SizedBox(width: 4),
+  //                           // Icon(
+  //                           //   Icons.keyboard_arrow_down,
+  //                           //   size: 20,
+  //                           //   color: Colors.black,
+  //                           // ),
+  //                         ],
+  //                       ),
+  //                       Text(
+  //                         address.isNotEmpty ? address : "Set location",
+  //                         style: TextStyle(
+  //                           fontSize: 12,
+  //                           color: Colors.grey.shade600,
+  //                         ),
+  //                         overflow: TextOverflow.ellipsis,
+  //                         maxLines: 1,
+  //                       ),
+  //                     ],
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+
+
+
+
   Widget _buildLocationWidget() {
-    return Consumer<LocationProvider>(
-      builder: (context, provider, _) {
-        final address = provider.address ?? '';
-        return Row(
+  return Consumer<LocationProvider>(
+    builder: (context, provider, _) {
+      final address = provider.address ?? '';
+      final hasLocation = address.isNotEmpty;
+
+      return GestureDetector(
+        onTap: () async {
+          if (!hasLocation) {
+            final granted =
+                await provider.requestLocationPermission();
+
+            if (!granted) {
+              GlobalToast.showError(
+                'Location permission is required to show nearby orders',
+              );
+              return;
+            }
+
+            await provider.initLocation(userId);
+          }
+        },
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.telegram_sharp, size: 24, color: Colors.green),
+            Icon(Icons.location_on, color: Colors.green, size: 24),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (provider.isLoading)
-                    SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: const Color(0xFF120698),
-                      ),
-                    )
-                  else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                _getDisplayAddress(address),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            // const SizedBox(width: 4),
-                            // Icon(
-                            //   Icons.keyboard_arrow_down,
-                            //   size: 20,
-                            //   color: Colors.black,
-                            // ),
-                          ],
-                        ),
-                        Text(
-                          address.isNotEmpty ? address : "Set location",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
+                  Text(
+                    hasLocation ? _getDisplayAddress(address) : 'Allow Location',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color:
+                          hasLocation ? Colors.black : Colors.green,
                     ),
+                  ),
+                  Text(
+                    hasLocation
+                        ? address
+                        : 'Tap to enable location',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
 
 

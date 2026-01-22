@@ -143,6 +143,7 @@
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:veggify_delivery_app/services/Location/api_location.dart';
 import 'package:veggify_delivery_app/services/Location/location_sercice.dart';
 
@@ -164,6 +165,26 @@ class LocationProvider extends ChangeNotifier {
   String get errorMessage => _errorMessage;
   bool get hasLocation => _coordinates != null && _coordinates!.length >= 2;
 
+
+
+
+Future<bool> requestLocationPermission() async {
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    _hasError = true;
+    _errorMessage = 'Location permission permanently denied';
+    notifyListeners();
+    return false;
+  }
+
+  return permission == LocationPermission.whileInUse ||
+         permission == LocationPermission.always;
+}
   // Initialize location (get current location)
   Future<void> initLocation(String userId) async {
     try {
@@ -350,4 +371,7 @@ class LocationProvider extends ChangeNotifier {
     stopLiveLocationUpdates();
     super.dispose();
   }
+
+
+  
 }

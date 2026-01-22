@@ -336,53 +336,53 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     /// 🔥 AUTO START BACKGROUND LOCATION FROM MAIN
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final loginProvider =
-          Provider.of<LoginProvider>(context, listen: false);
-      final locationProvider =
-          Provider.of<LocationProvider>(context, listen: false);
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   final loginProvider =
+    //       Provider.of<LoginProvider>(context, listen: false);
+    //   final locationProvider =
+    //       Provider.of<LocationProvider>(context, listen: false);
 
-      // 1️⃣ On app start: check if rider is already logged in (SessionManager)
-      final initialId = await SessionManager.getUserId();
-      debugPrint("[MAIN] SessionManager initialId: $initialId");
+    //   // 1️⃣ On app start: check if rider is already logged in (SessionManager)
+    //   final initialId = await SessionManager.getUserId();
+    //   debugPrint("[MAIN] SessionManager initialId: $initialId");
 
-      if (initialId != "") {
-        debugPrint("✅ [MAIN] Existing rider session found: $initialId");
+    //   if (initialId != "") {
+    //     debugPrint("✅ [MAIN] Existing rider session found: $initialId");
 
-        // This will print from LocationProvider.initLocation and _updateLiveLocation
-        await locationProvider.initLocation(initialId.toString());
-        locationProvider.startLiveLocationUpdates(initialId.toString());
+    //     // This will print from LocationProvider.initLocation and _updateLiveLocation
+    //     await locationProvider.initLocation(initialId.toString());
+    //     locationProvider.startLiveLocationUpdates(initialId.toString());
 
-        debugPrint(
-          "📍 [MAIN] Location tracking started on app launch for rider $initialId",
-        );
-      } else {
-        debugPrint("ℹ️ [MAIN] No rider session on launch, not starting tracking");
-      }
+    //     debugPrint(
+    //       "📍 [MAIN] Location tracking started on app launch for rider $initialId",
+    //     );
+    //   } else {
+    //     debugPrint("ℹ️ [MAIN] No rider session on launch, not starting tracking");
+    //   }
 
-      // 2️⃣ Listen for future login/logout changes
-      _loginListener = () async {
-        final id = await SessionManager.keyUserId;
-        debugPrint("👀 [MAIN] LoginProvider changed, SessionManager userId: $id");
+    //   // 2️⃣ Listen for future login/logout changes
+    //   _loginListener = () async {
+    //     final id = await SessionManager.keyUserId;
+    //     debugPrint("👀 [MAIN] LoginProvider changed, SessionManager userId: $id");
 
-        if (id != null && id.isNotEmpty) {
-          final riderId = id;
-          debugPrint("✅ [MAIN] Rider logged in: $riderId");
+    //     if (id != null && id.isNotEmpty) {
+    //       final riderId = id;
+    //       debugPrint("✅ [MAIN] Rider logged in: $riderId");
 
-          await locationProvider.initLocation(riderId);
-          locationProvider.startLiveLocationUpdates(riderId);
+    //       await locationProvider.initLocation(riderId);
+    //       locationProvider.startLiveLocationUpdates(riderId);
 
-          debugPrint(
-            "📍 [MAIN] Location tracking started from MAIN listener for rider $riderId",
-          );
-        } else {
-          locationProvider.stopLiveLocationUpdates();
-          debugPrint("🛑 [MAIN] Location tracking stopped (logout)");
-        }
-      };
+    //       debugPrint(
+    //         "📍 [MAIN] Location tracking started from MAIN listener for rider $riderId",
+    //       );
+    //     } else {
+    //       locationProvider.stopLiveLocationUpdates();
+    //       debugPrint("🛑 [MAIN] Location tracking stopped (logout)");
+    //     }
+    //   };
 
-      loginProvider.addListener(_loginListener!);
-    });
+    //   loginProvider.addListener(_loginListener!);
+    // });
   }
 
   @override
@@ -398,7 +398,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Veggify Delivery App',
+      title: 'Veggify Express',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
